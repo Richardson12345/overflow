@@ -1,3 +1,4 @@
+require('dotenv').config()
 function sendMail (destination) {
 
   // console.log(data, 'from nodemail')
@@ -5,7 +6,7 @@ function sendMail (destination) {
   //var send = require('../index.js')({
     user: 'chuddywarrior@gmail.com',
     // user: credentials.user,                  // Your GMail account used to send emails
-    pass: 'kfurkxyxrnsocatx',
+    pass: process.env.MAILER_PASS,
     // pass: credentials.pass,                  // Application-specific password
     to:   destination,
     // to:   credentials.user,                  // Send to yourself
