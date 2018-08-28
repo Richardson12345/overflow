@@ -1,30 +1,24 @@
-let send = function (email) {
+function sendMail (destination) {
 
-    var nodemailer = require('nodemailer');
-    var transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: "invoke.computer@gmail.com", // generated ethereal user
-        pass: "11121314151" // generated ethereal passwor
-      }
-    });
-  
-  
-    const mailOptions = {
-      from: 'invoke.computer@gmail.com', // sender address
-      to: email,  // list of receivers
-      subject: 'wellcome to subarshi overflowing', // Subject line
-      html: '<p>Hi welcome to the subarashi overflow! hontoni subarashi dude. SUGGGOIII!!!! </p>' // plain text body
-    };
-  
-  
-    transporter.sendMail(mailOptions, function (err, info) {
-      if (err)
-        console.log(err)
-      else
-        console.log(info);
-    });
-  
-  }
-  
-  module.exports = send
+  // console.log(data, 'from nodemail')
+  var send = require('gmail-send')({
+  //var send = require('../index.js')({
+    user: 'chuddywarrior@gmail.com',
+    // user: credentials.user,                  // Your GMail account used to send emails
+    pass: 'kfurkxyxrnsocatx',
+    // pass: credentials.pass,                  // Application-specific password
+    to:   destination,
+    // to:   credentials.user,                  // Send to yourself
+                                             // you also may set array of recipients:
+                                             // [ 'user1@gmail.com', 'user2@gmail.com' ]
+    // from:    credentials.user,            // from: by default equals to user
+    // replyTo: credentials.user,            // replyTo: by default undefined
+    // bcc: 'some-user@mail.com',            // almost any option of `nodemailer` will be passed to it
+    subject: 'wellcome to my overflow project',
+    text:    'please enjoy my overflow project hehheh',         // Plain text
+    //html:    '<b>html text</b>'            // HTML
+  });
+  send()
+}
+
+module.exports = sendMail

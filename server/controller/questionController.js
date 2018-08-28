@@ -1,6 +1,7 @@
 var questionModel = require("../model/questionModel");
 var jwt = require("jsonwebtoken");
-var mongoose  = require("mongoose");
+var mongoose  = require("mongoose"); 
+   
 
 class Controller {
     static getSpecificQuestion(req,res){
@@ -153,7 +154,10 @@ class Controller {
                     }else{
                         let user = question.user._id;
                         let validate = (user == id);
-                        if(question.downVote.indexOf(id) == -1 || validate == false ){
+                        console.log(user)
+                        console.log(id)
+                        console.log(validate)
+                        if(question.downVote.indexOf(id) == -1 && validate == false ){
                             question.downVote.push(id);
                             question.save(function (err, updatedquestion) {
                               if(err){
@@ -201,7 +205,20 @@ class Controller {
         })
     }
 
-
+    static deleteQuestion(req,res){
+        questionModel.findByIdAndRemove(req.params.id, 
+        ( err, changes ) => {
+            if ( err ) {
+                res
+                .status(401)
+                .json(err)        
+            } else {
+                res
+                .status(201)
+                .json(changes)
+            }
+        })        
+    }
 }
 
 module.exports = Controller;

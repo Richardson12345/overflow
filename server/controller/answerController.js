@@ -1,8 +1,58 @@
 var answerModel = require("../model/answerModel");
+var questionModel = require('../model/questionModel')
 var jwt = require("jsonwebtoken");
 var mongoose = require ("mongoose");
+var CronJob = require('cron').CronJob;
+
+new CronJob('* 5 8 * * 0', function() {
+    console.log('cron starting cleanup')
+    answerModel.find()
+    .then((data => {
+       for ( let z = 0; z < data.length; z ++ ) {
+        let asnwerId = data[z]._id
+        let questionId = data[z].question
+        questionModel
+        .findById(questionId)
+        .then((data => {
+            if ( data == null ) {
+                console.log('not found lmao')
+                answerModel.findByIdAndRemove(asnwerId)
+                .then((data => {
+                    console.log(data)
+                    console.log('succesfully deleted')
+                }))
+                .catch((err => {
+                    console.log(err)
+                }))
+            }
+        }))
+        .catch((err => {
+            console.log(err)
+        })) 
+       }
+    }))
+    .catch((err => {
+        console.log(err)
+    }))
+
+}, null, true, 'Asia/Jakarta');
+
 
 class Controller {
+    static getOneAns ( req, res ) {
+        answerModel.findById(req.params.id, ( err, data ) => {
+            if ( err ) {
+                res
+                .status(404)
+                .json(err)
+            } else {
+                res
+                .status(200)
+                .json(data)
+            }
+        })
+    }
+
     static answerQuestion(req,res){
         let token = req.headers.token;
         jwt.verify(token, "secret", (err, decoded)=>{
@@ -76,9 +126,28 @@ class Controller {
                 .json(data)
             }
         })
+    }
+
+    
+    static updateAnswer ( req, res ) {
+        let id = req.params.id
+        let updateObj = {
+            answer: req.body.answer
+        }
+        answerModel.findByIdAndUpdate(id, updateObj, ( err, changes ) => {
+            if ( err ) {
+                res
+                .status(500)
+                .json(err)
+            } else {
+                res
+                .status(201)
+                .json(changes)
+            }
+        })
 
     }
-    
+
     static upvoteAnswer(req,res){
         let token = req.headers.token;
         let answerId = req.body.answer;

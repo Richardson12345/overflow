@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken');
 const bcrpyt = require('bcryptjs');
 const FB = require('fb');
 const send = require('../middleware/nodemailer');
-
+const queue = require('../kue')
+var sendMail = require('../middleware/nodemailer')
 
 class Controller {
     static signUp(req,res){
@@ -26,7 +27,15 @@ class Controller {
                         .status(500)
                         .json(err)
                     }else{
-                        send(req.body.email);
+                        queue.create('gmail', {
+                            email: req.body.email
+                        })
+                        .priority('medium')
+                        .save( function(err){
+                           if( !err ) {
+                            console.log('saved')
+                           };
+                        });
                         res
                         .status(200)
                         .json(data)
@@ -143,8 +152,7 @@ class Controller {
             })
         })
     }
-
-
 }
+
 
 module.exports = Controller

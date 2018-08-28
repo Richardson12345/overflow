@@ -6,6 +6,13 @@ var logger = require('morgan');
 var cors = require('cors');
 var mongoose = require('mongoose');
 const db = mongoose.connection;
+var kue = require('kue-scheduler')
+  , Queue = kue.createQueue();
+
+Queue.process('email', function (job, done) {
+    console.log(job.data)
+    done();
+});  
 
 mongoose.connect("mongodb://admin:abc123@ds259241.mlab.com:59241/subarashi-overflow", {
   useNewUrlParser: true,
