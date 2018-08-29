@@ -134,18 +134,28 @@ class Controller {
         let updateObj = {
             answer: req.body.answer
         }
-        answerModel.findByIdAndUpdate(id, updateObj, ( err, changes ) => {
-            if ( err ) {
-                res
-                .status(500)
-                .json(err)
-            } else {
-                res
-                .status(201)
-                .json(changes)
+        answerModel.findById(mongoose.Types.ObjectId(id))
+        .then((result => {
+            let owner = result.user._id
+            if ( owner == req.body.current ) {
+                answerModel.findByIdAndUpdate(id, updateObj, ( err, changes ) => {
+                    if ( err ) {
+                        res
+                        .status(500)
+                        .json(err)
+                    } else {
+                        res
+                        .status(201)
+                        .json(changes)
+                    }
+                })
             }
-        })
-
+        }))
+        .catch((err => {
+            res
+            .status(404)
+            .json(err)
+        }))
     }
 
     static upvoteAnswer(req,res){

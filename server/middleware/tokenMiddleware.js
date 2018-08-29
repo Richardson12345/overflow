@@ -16,12 +16,13 @@ class tokenController {
                         userModel.findById(mongoose.Types.ObjectId(decoded._id))
                         .then((result => {
                            if (result !== null && result !== undefined) {
+                               req.body.current = decoded._id
                                next()
                            }
                         }))
                         .catch((err => {
                             res
-                            .status(400)
+                            .status(404)
                             .json(err)
                         }))
                     }else{

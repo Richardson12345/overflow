@@ -190,34 +190,66 @@ class Controller {
 
     static updateQuestion(req,res){
         let question = req.body.question;
-        let input = req.body.input;
-        questionModel.updateOne({ _id :  mongoose.Types.ObjectId(question) },
-         { input },(err, result )=> {
-            if(err){
-               res
-               .status(500)
-               .json(err)
-            }else{
+        questionModel.findById({ _id :  mongoose.Types.ObjectId(question) })
+        .then((result => {
+            let owner = result.user._id
+            if( owner == req.body.current) {
+                let input = req.body.input;
+                questionModel.updateOne({ _id :  mongoose.Types.ObjectId(question) },
+                 { input },(err, result )=> {
+                    if(err){
+                       res
+                       .status(500)
+                       .json(err)
+                    }else{
+                        res
+                        .status(200)
+                        .json(result);
+                    }
+                })
+            } else {
                 res
-                .status(200)
-                .json(result);
+                .status(401)
+                .json(err)
             }
-        })
+        }))
+        .catch((err => {
+            res
+            .status(401)
+            .json(err)
+        }))
     }
 
     static deleteQuestion(req,res){
-        questionModel.findByIdAndRemove(req.params.id, 
-        ( err, changes ) => {
-            if ( err ) {
-                res
-                .status(401)
-                .json(err)        
+        let question = req.body.question;
+        questionModel.findById({ _id :  mongoose.Types.ObjectId(question) })
+        .then((result => {
+            let owner = result.user._id
+            if( owner == req.body.current) {
+                let input = req.body.input;
+                questionModel.findByIdAndRemove(req.params.id, 
+                    ( err, changes ) => {
+                    if ( err ) {
+                        res
+                        .status(401)
+                        .json(err)        
+                    } else {
+                        res
+                        .status(201)
+                        .json(changes)
+                    }
+                })  
             } else {
                 res
-                .status(201)
-                .json(changes)
+                .status(401)
+                .json(err)
             }
-        })        
+        }))
+        .catch((err => {
+            res
+            .status(401)
+            .json(err)
+        }))      
     }
 }
 
