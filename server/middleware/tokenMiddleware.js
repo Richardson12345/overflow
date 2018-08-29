@@ -1,4 +1,6 @@
 var jwt = require("jsonwebtoken");
+var userModel = require('../model/userModel')
+var mongoose = require('mongoose')
 
 class tokenController {
     static verifyToken(req,res,next){
@@ -11,7 +13,17 @@ class tokenController {
                     res.json("you must be logged in to perform this task")
                 }else{
                     if(decoded){
-                        next();
+                        userModel.findById(mongoose.Types.ObjectId(decoded._id))
+                        .then((result => {
+                           if (result !== null && result !== undefined) {
+                               next()
+                           }
+                        }))
+                        .catch((err => {
+                            res
+                            .status(400)
+                            .json(err)
+                        }))
                     }else{
                         res.status(500).json({
                             msg: "internal service err"
